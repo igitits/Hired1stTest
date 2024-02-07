@@ -70,7 +70,7 @@ namespace Hired1stTest.Services
         public int UpdateUser(User user)
         {
             var filter = Builders<User>.Filter.Eq(x => x.Email, user.Email);
-            var userExist = _mongoDBService._usersCollection.Find(x => x.Email == user.Email).FirstOrDefault() ?? null;
+            var userExist = _mongoDBService._usersCollection.Find(filter).FirstOrDefault() ?? null;
             if (userExist != null)
             {
                 userExist.FirstName = user.FirstName;
@@ -99,7 +99,21 @@ namespace Hired1stTest.Services
         public int UpdatePassword(ForgotPassDTO dto) 
         {
             var filter = Builders<User>.Filter.Eq(r => r.Email, dto.Email);
-            var update
+            var userExist = _mongoDBService._usersCollection.Find(filter).FirstOrDefault() ?? null;
+
+            if (userExist != null)
+            {
+                userExist.SetPassword(dto.Password);
+
+                var updatePass = _mongoDBService._usersCollection.ReplaceOne(filter, userExist);
+                
+                if (updatePass.IsAcknowledged && updatePass.MatchedCount > 0)
+                {
+                    return 1;
+                }
+                else return -1;
+            }
+            return -1;
         }
     }
 }

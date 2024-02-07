@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.AspNetCore.Identity;
 
 namespace Hired1stTest.Models
 {
@@ -22,15 +23,25 @@ namespace Hired1stTest.Models
         [EmailAddress]
         [JsonPropertyName("email")]
         public string Email { get; set; }
-        [Required]
         [JsonPropertyName("password")]
         public string Password { get; private set; }
+
         public void SetPassword(string password) 
         {
             using (var sha256 = SHA256.Create())
             {
                 byte[] hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
                 Password = BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
+            }
+        }
+
+        public bool VerifyPassword(string password)
+        {
+            using (var sha256 = SHA256.Create())
+            {
+                byte[] hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+                string inputHash = BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
+                return Password == inputHash;
             }
         }
     }

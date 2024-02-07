@@ -1,5 +1,6 @@
 ﻿using Hired1stTest.DTO;
 using Hired1stTest.Models;
+using Hired1stTest.Services;
 using Hired1stTest.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,10 +11,12 @@ namespace Hired1stTest.Controllers
     public class UserController : Controller
     {
         private IUser _userService;
+        private IConfiguration _configuration;
 
-        public UserController(IUser userService)
+        public UserController(IUser userService, IConfiguration configuration)
         {
             _userService = userService;
+            _configuration = configuration;
         }
 
         [HttpGet]
@@ -86,6 +89,7 @@ namespace Hired1stTest.Controllers
         {
             var user = _userService.LoginUser(cred);
             if (user == null) { return NotFound(); }
+
             return Ok(user);
         }
     }
